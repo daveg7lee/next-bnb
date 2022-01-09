@@ -5,7 +5,7 @@ import useModal from '../hooks/useModal';
 import Icon from '../public/static/svg/logo/logo.svg';
 import TextIcon from '../public/static/svg/logo/logo_text.svg';
 import palette from '../styles/palette';
-import SignUpModal from './auth/SignUpModal';
+import SignUpModal from './auths/SignUpModal';
 
 const Container = styled.div`
   position: sticky;
