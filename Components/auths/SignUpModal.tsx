@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, useState } from 'react';
+import { ChangeEvent, FC, FormEvent, useState } from 'react';
 import styled from 'styled-components';
 import XIcon from '../../public/static/svg/modal/modal_x_icon.svg';
 import {
@@ -12,8 +12,9 @@ import palette from '../../styles/palette';
 import Selector from '../common/Selector';
 import { dayList, monthList, yearList } from '../../lib/staticData';
 import Button from '../common/Button';
+import { signupAPI } from '../../lib/api/auth';
 
-const Container = styled.div`
+const Container = styled.form`
   width: 568px;
   padding: 32px;
   background-color: white;
@@ -80,7 +81,7 @@ const SubmitBtnWrapper = styled.div`
 `;
 
 const SignUpModal: FC = () => {
-  const [hidePassword, setHidePassword] = useState(false);
+  const [hidePassword, setHidePassword] = useState(true);
   const [email, setEmail] = useState('');
   const [lastname, setLastname] = useState('');
   const [firstname, setFirstname] = useState('');
@@ -121,8 +122,30 @@ const SignUpModal: FC = () => {
     setHidePassword(!hidePassword);
   };
 
+  const onSubmitSignup = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const signUpBody = {
+        email,
+        lastname,
+        firstname,
+        password,
+        birthday: new Date(
+          `${birthYear!.replace('년', '')}-${birthMonth!.replace(
+            '월',
+            ''
+          )}=${birthDay!.replace('일', '')}`
+        ).toISOString(),
+      };
+      await signupAPI(signUpBody);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
-    <Container>
+    <Container onSubmit={onSubmitSignup}>
       <CloseIcon />
       <InputWrapper>
         <Input

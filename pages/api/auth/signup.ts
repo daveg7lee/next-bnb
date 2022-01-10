@@ -2,10 +2,21 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcryptjs';
 import Data from '../../../lib/data';
 import jwt from 'jsonwebtoken';
-import { StoredUserType } from '../../../types/user';
+import { StoredUserType, UserType } from '../../../types/user';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
+    const {
+      body,
+    }: {
+      body;
+    } = req;
+    const { email, firstname, lastname, password, birthday } = body;
+    if (!email || !firstname || !lastname || !password || !birthday) {
+      res.statusCode = 400;
+      return res.send('필수 데이터가 없습니다.');
+    }
+
     const userExist = Data.user.exist({ email: req.body.email });
     if (userExist) {
       res.statusCode = 409;
@@ -21,11 +32,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     }
     const newUser: StoredUserType = {
       id: userId,
-      email: req.body.email,
-      firstname: req.body.firstname,
-      lastname: req.body.lastname,
+      ...req.body,
       password: hashedPassword,
-      birthday: req.body.birthday,
       profileImage:
         'https://github.com/jerrynim/next-airbnb/blob/master/public/static/image/default_user_profile_image.jpg?raw=true',
     };
@@ -41,7 +49,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       )}; httponly`
     );
 
-    return res.end();
+    const newUserWithoutPassword: Partial<Pick<StoredUserType, 'password'>> =
+      newUser;
+
+    delete newUserWithoutPassword.password;
+    res.statusCode = 200;
+    return res.send(newUser);
   }
   res.statusCode = 405;
   return res.end();
