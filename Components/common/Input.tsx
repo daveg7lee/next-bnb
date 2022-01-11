@@ -1,4 +1,5 @@
 import { FC, InputHTMLAttributes } from 'react';
+import { useSelector } from '../../store';
 import styled, { css } from 'styled-components';
 import palette from '../../styles/palette';
 
@@ -11,7 +12,6 @@ type InputContainerProps = {
 interface IProps extends InputHTMLAttributes<HTMLInputElement> {
   icon?: JSX.Element;
   isValid?: boolean;
-  validateMode?: boolean;
   useValidation?: boolean;
   errorMessage?: string;
 }
@@ -69,12 +69,12 @@ const ErrorMessage = styled.p`
 
 const Input: FC<IProps> = ({
   icon,
-  validateMode,
   isValid = false,
   useValidation = true,
   errorMessage,
   ...props
 }) => {
+  const validateMode = useSelector((state) => state.common.validateMode);
   return (
     <Container
       iconExist={!!icon}
