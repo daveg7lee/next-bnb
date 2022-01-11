@@ -5,3 +5,4 @@ Clone Airbnb with Next.JS ([클론코딩으로 시작하는 Next.JS](http://www.
 ## To Do
 
 - [ ] Apply react-hook-form for form validation & form performance
+- [ ] Code Refactoring
