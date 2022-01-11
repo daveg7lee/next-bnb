@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { FC } from 'react';
+import { AiOutlineMenu } from 'react-icons/ai';
 import styled from 'styled-components';
 import useModal from '../hooks/useModal';
 import Icon from '../public/static/svg/logo/logo.svg';
 import TextIcon from '../public/static/svg/logo/logo_text.svg';
+import { useSelector } from '../store';
 import palette from '../styles/palette';
 import SignUpModal from './auths/SignUpModal';
 
@@ -30,7 +32,7 @@ const LogoIcon = styled(Icon)`
   margin-right: 6px;
 `;
 
-const ButtonWrapper = styled.div``;
+const AuthBtnsWrapper = styled.div``;
 
 const SignUpBtn = styled.button`
   height: 42px;
@@ -60,8 +62,32 @@ const LogInBtn = styled.button`
   }
 `;
 
+const ProfileBtn = styled.button`
+  display: flex;
+  align-items: center;
+  height: 42px;
+  padding: 0 6px 0 16px;
+  border: 0;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.18);
+  border-radius: 21px;
+  background-color: white;
+  cursor: pointer;
+  outline: none;
+  &:hover {
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.12);
+  }
+`;
+
+const ProfileImg = styled.img`
+  margin-left: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+`;
+
 const Header: FC = () => {
-  const { openModalPortal, ModalPortal } = useModal();
+  const { openModalPortal, ModalPortal, closeModalPortal } = useModal();
+  const user = useSelector((state) => state.user);
   return (
     <Container>
       <Link href="/">
@@ -70,12 +96,20 @@ const Header: FC = () => {
           <TextIcon />
         </LogoWrapper>
       </Link>
-      <ButtonWrapper>
-        <SignUpBtn onClick={openModalPortal}>회원가입</SignUpBtn>
-        <LogInBtn>로그인</LogInBtn>
-      </ButtonWrapper>
+      {!user.isLogged && (
+        <AuthBtnsWrapper>
+          <SignUpBtn onClick={openModalPortal}>회원가입</SignUpBtn>
+          <LogInBtn>로그인</LogInBtn>
+        </AuthBtnsWrapper>
+      )}
+      {user.isLogged && (
+        <ProfileBtn type="button">
+          <AiOutlineMenu />
+          <ProfileImg src={user.profileImage} alt="Profile Img" />
+        </ProfileBtn>
+      )}
       <ModalPortal>
-        <SignUpModal />
+        <SignUpModal closeModal={closeModalPortal} />
       </ModalPortal>
     </Container>
   );

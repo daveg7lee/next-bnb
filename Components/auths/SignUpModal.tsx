@@ -1,4 +1,11 @@
-import { ChangeEvent, FC, FormEvent, useMemo, useState } from 'react';
+import {
+  ChangeEvent,
+  FC,
+  FormEvent,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import styled from 'styled-components';
 import XIcon from '../../public/static/svg/modal/modal_x_icon.svg';
 import {
@@ -15,9 +22,12 @@ import Button from '../common/Button';
 import { signupAPI } from '../../lib/api/auth';
 import { useDispatch } from 'react-redux';
 import { userActions } from '../../store/user';
-import { commonActions } from '../../store/common';
 import useValidateMode from '../../hooks/useValidateMode';
 import PasswordWarning from './PasswordWarning';
+
+interface IProps {
+  closeModal: () => void;
+}
 
 const Container = styled.form`
   width: 568px;
@@ -85,9 +95,15 @@ const SubmitBtnWrapper = styled.div`
   border-bottom: 1px solid ${palette.gray_eb};
 `;
 
+const SetLogin = styled.span`
+  color: ${palette.dark_cyan};
+  margin-left: 8px;
+  cursor: pointer;
+`;
+
 const PASSWORD_MIN_LENGTH = 8;
 
-const SignUpModal: FC = () => {
+const SignUpModal: FC<IProps> = ({ closeModal }) => {
   const { setValidateMode } = useValidateMode();
   const [hidePassword, setHidePassword] = useState(true);
   const [email, setEmail] = useState('');
@@ -99,6 +115,12 @@ const SignUpModal: FC = () => {
   const [birthYear, setBirthYear] = useState('');
   const [passwordFocused, setPasswordFocused] = useState(false);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    return () => {
+      setValidateMode(false);
+    };
+  }, []);
 
   const isPasswordHasNameOrEmail = useMemo(
     () =>
@@ -164,7 +186,7 @@ const SignUpModal: FC = () => {
     if (
       isPasswordHasNameOrEmail ||
       !isPasswordOverMinLength ||
-      isPasswordHasNumberOrSymbol
+      !isPasswordHasNumberOrSymbol
     ) {
       return false;
     }
@@ -193,8 +215,12 @@ const SignUpModal: FC = () => {
             )}-${birthDay!.replace('일', '')}`
           ).toISOString(),
         };
+
         const { data } = await signupAPI(signUpBody);
+
         dispatch(userActions.setLoggedUser(data));
+
+        closeModal();
       } catch (e) {
         console.log(e);
       }
@@ -203,7 +229,7 @@ const SignUpModal: FC = () => {
 
   return (
     <Container onSubmit={onSubmitSignup}>
-      <CloseIcon />
+      <CloseIcon onClick={closeModal} />
       <InputWrapper>
         <Input
           type="email"
@@ -312,6 +338,12 @@ const SignUpModal: FC = () => {
       <SubmitBtnWrapper>
         <Button type="submit">가입하기</Button>
       </SubmitBtnWrapper>
+      <p>
+        이미 에어비앤비 계정이 있나요?
+        <SetLogin role="presentation" onClick={() => {}}>
+          로그인
+        </SetLogin>
+      </p>
     </Container>
   );
 };
