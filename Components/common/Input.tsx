@@ -1,12 +1,22 @@
 import { FC, InputHTMLAttributes } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import palette from '../../styles/palette';
+
+type InputContainerProps = {
+  iconExist: boolean;
+  isValid: boolean;
+  useValidation: boolean;
+};
 
 interface IProps extends InputHTMLAttributes<HTMLInputElement> {
   icon?: JSX.Element;
+  isValid?: boolean;
+  validateMode?: boolean;
+  useValidation?: boolean;
+  errorMessage?: string;
 }
 
-const Container = styled.div<{ iconExist: boolean }>`
+const Container = styled.div<InputContainerProps>`
   input {
     position: relative;
     width: 100%;
@@ -23,22 +33,59 @@ const Container = styled.div<{ iconExist: boolean }>`
       border-color: ${palette.dark_cyan} !important;
     }
   }
+  svg {
+    position: absolute;
+    right: 11px;
+    top: 0 !important;
+    height: 46px;
+  }
+  ${({ useValidation, isValid }) =>
+    useValidation &&
+    !isValid &&
+    css`
+      input {
+        background-color: ${palette.snow};
+        border-color: ${palette.orange};
+        &:focus {
+          border-color: ${palette.orange};
+        }
+      }
+    `}
+  ${({ useValidation, isValid }) =>
+    useValidation &&
+    isValid &&
+    css`
+    input{
+      border-color: ${palette.dark_cyan}
+    `}
 `;
 
-const IconWrapper = styled.div`
-  position: absolute;
-  top: 0;
-  right: 11px;
-  height: 46px;
-  display: flex;
-  align-items: center;
+const ErrorMessage = styled.p`
+  margin-top: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  color: ${palette.tawny};
 `;
 
-const Input: FC<IProps> = ({ icon, ...props }) => {
+const Input: FC<IProps> = ({
+  icon,
+  validateMode,
+  isValid = false,
+  useValidation = true,
+  errorMessage,
+  ...props
+}) => {
   return (
-    <Container iconExist={!icon}>
+    <Container
+      iconExist={!!icon}
+      isValid={isValid}
+      useValidation={validateMode && useValidation}
+    >
       <input {...props} />
-      <IconWrapper>{icon}</IconWrapper>
+      {icon}
+      {useValidation && validateMode && !isValid && errorMessage && (
+        <ErrorMessage>{errorMessage}</ErrorMessage>
+      )}
     </Container>
   );
 };
