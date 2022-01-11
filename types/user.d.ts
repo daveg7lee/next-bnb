@@ -13,6 +13,6 @@ export type StoredUserType = {
   password?: string;
   firstname: string;
   lastname: string;
-  birthday: Date;
+  birthday: Date | null;
   profileImage: string;
 };

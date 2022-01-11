@@ -7,7 +7,7 @@ const initialState: UserState = {
   email: '',
   lastname: '',
   firstname: '',
-  birthday: new Date('2005-10-26'),
+  birthday: null,
   isLogged: false,
   profileImage: '',
 };

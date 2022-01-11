@@ -94,9 +94,9 @@ const SignUpModal: FC = () => {
   const [lastname, setLastname] = useState('');
   const [firstname, setFirstname] = useState('');
   const [password, setPassword] = useState('');
-  const [birthMonth, setBirthMonth] = useState('월');
-  const [birthDay, setBirthDay] = useState('일');
-  const [birthYear, setBirthYear] = useState('년');
+  const [birthMonth, setBirthMonth] = useState('');
+  const [birthDay, setBirthDay] = useState('');
+  const [birthYear, setBirthYear] = useState('');
   const [passwordFocused, setPasswordFocused] = useState(false);
   const dispatch = useDispatch();
 
@@ -157,28 +157,47 @@ const SignUpModal: FC = () => {
     setPasswordFocused(true);
   };
 
+  const validateSignUpForm = () => {
+    if (!email || !lastname || !firstname || !password) {
+      return false;
+    }
+    if (
+      isPasswordHasNameOrEmail ||
+      !isPasswordOverMinLength ||
+      isPasswordHasNumberOrSymbol
+    ) {
+      return false;
+    }
+    if (!birthDay || !birthYear || !birthMonth) {
+      return false;
+    }
+    return true;
+  };
+
   const onSubmitSignup = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setValidateMode(true);
 
-    try {
-      const signUpBody = {
-        email,
-        lastname,
-        firstname,
-        password,
-        birthday: new Date(
-          `${birthYear!.replace('년', '')}-${birthMonth!.replace(
-            '월',
-            ''
-          )}-${birthDay!.replace('일', '')}`
-        ).toISOString(),
-      };
-      const { data } = await signupAPI(signUpBody);
-      dispatch(userActions.setLoggedUser(data));
-    } catch (e) {
-      console.log(e);
+    if (validateSignUpForm()) {
+      try {
+        const signUpBody = {
+          email,
+          lastname,
+          firstname,
+          password,
+          birthday: new Date(
+            `${birthYear!.replace('년', '')}-${birthMonth!.replace(
+              '월',
+              ''
+            )}-${birthDay!.replace('일', '')}`
+          ).toISOString(),
+        };
+        const { data } = await signupAPI(signUpBody);
+        dispatch(userActions.setLoggedUser(data));
+      } catch (e) {
+        console.log(e);
+      }
     }
   };
 
@@ -266,24 +285,27 @@ const SignUpModal: FC = () => {
           <Selector
             options={yearList}
             disabledOptions={['년']}
-            value={birthYear}
+            value={birthYear || '년'}
             onChange={onChangeBirthYear}
+            isValid={!!birthYear}
           />
         </div>
         <div className="birthday-month-selector">
           <Selector
             options={monthList}
             disabledOptions={['월']}
-            value={birthMonth}
+            value={birthMonth || '월'}
             onChange={onChangeBirthMonth}
+            isValid={!!birthMonth}
           />
         </div>
         <div className="birthday-day-selector">
           <Selector
             options={dayList}
             disabledOptions={['일']}
-            value={birthDay}
+            value={birthDay || '일'}
             onChange={onChangeBirthDay}
+            isValid={!!birthDay}
           />
         </div>
       </div>
