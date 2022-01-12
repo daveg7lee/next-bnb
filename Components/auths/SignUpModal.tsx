@@ -24,6 +24,7 @@ import { useDispatch } from 'react-redux';
 import { userActions } from '../../store/user';
 import useValidateMode from '../../hooks/useValidateMode';
 import PasswordWarning from './PasswordWarning';
+import { authActions } from '../../store/auth';
 
 interface IProps {
   closeModal: () => void;
@@ -340,7 +341,10 @@ const SignUpModal: FC<IProps> = ({ closeModal }) => {
       </SubmitBtnWrapper>
       <p>
         이미 에어비앤비 계정이 있나요?
-        <SetLogin role="presentation" onClick={() => {}}>
+        <SetLogin
+          role="presentation"
+          onClick={() => dispatch(authActions.setAuthMode('login'))}
+        >
           로그인
         </SetLogin>
       </p>

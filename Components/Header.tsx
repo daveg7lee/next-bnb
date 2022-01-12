@@ -1,13 +1,15 @@
 import Link from 'next/link';
 import { FC } from 'react';
 import { AiOutlineMenu } from 'react-icons/ai';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import useModal from '../hooks/useModal';
 import Icon from '../public/static/svg/logo/logo.svg';
 import TextIcon from '../public/static/svg/logo/logo_text.svg';
 import { useSelector } from '../store';
+import { authActions } from '../store/auth';
 import palette from '../styles/palette';
-import SignUpModal from './auths/SignUpModal';
+import AuthModal from './auths/AuthModal';
 
 const Container = styled.div`
   position: sticky;
@@ -88,6 +90,7 @@ const ProfileImg = styled.img`
 const Header: FC = () => {
   const { openModalPortal, ModalPortal, closeModalPortal } = useModal();
   const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   return (
     <Container>
       <Link href="/">
@@ -98,8 +101,22 @@ const Header: FC = () => {
       </Link>
       {!user.isLogged && (
         <AuthBtnsWrapper>
-          <SignUpBtn onClick={openModalPortal}>회원가입</SignUpBtn>
-          <LogInBtn>로그인</LogInBtn>
+          <SignUpBtn
+            onClick={() => {
+              dispatch(authActions.setAuthMode('signup'));
+              openModalPortal();
+            }}
+          >
+            회원가입
+          </SignUpBtn>
+          <LogInBtn
+            onClick={() => {
+              dispatch(authActions.setAuthMode('login'));
+              openModalPortal();
+            }}
+          >
+            로그인
+          </LogInBtn>
         </AuthBtnsWrapper>
       )}
       {user.isLogged && (
@@ -109,7 +126,7 @@ const Header: FC = () => {
         </ProfileBtn>
       )}
       <ModalPortal>
-        <SignUpModal closeModal={closeModalPortal} />
+        <AuthModal closeModal={closeModalPortal} />
       </ModalPortal>
     </Container>
   );
